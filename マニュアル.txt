@@ -1,0 +1,8 @@
+1. windowsの場合、以下サイトよりpoppler-0.67.0_x86をダウンロード
+https://blog.alivate.com.au/poppler-windows/
+
+2. 1.でダウンロードしたファイルを解凍
+
+2. 2.のファイルを任意の場所に配置し、以下のような環境パスを通す
+例）C:\Program Files\poppler-0.67.0\bin
+
