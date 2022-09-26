@@ -5,13 +5,24 @@ import glob
 from docx2pdf import convert
 from pdf2image import convert_from_path
 import csv
+import sys
 import os
 
-CSV_DIR = "csv/"
-TEMPLATE_DOC = "document/template.docx"
-DOC_DIR = "document/temp/"
-PDF_DIR = "pdf/"
-IMAGES_DIR = "images/"
+
+def get_dir_path():
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.dirname(__file__)
+
+    return base_path
+
+
+CSV_DIR = get_dir_path() + "/csv"
+TEMPLATE_DOC = get_dir_path() + "/document/template.docx"
+DOC_DIR = get_dir_path() + "/document/temp"
+PDF_DIR = get_dir_path() + "/pdf"
+IMAGES_DIR = get_dir_path() + "/images"
 
 
 def get_csv_data_list():
@@ -19,7 +30,7 @@ def get_csv_data_list():
     csvファイル一覧を取得し、値を配列で返す
     """
 
-    csvFilePathList = glob.glob(CSV_DIR + "*.csv")
+    csvFilePathList = glob.glob(CSV_DIR + "/*.csv")
 
     csvDataList = []
     for csvFilePath in csvFilePathList:
@@ -46,7 +57,7 @@ def create_document():
 
     for row in csvDataList:
         if len(row) == 3:
-            new_doc_path = DOC_DIR + row[2] + "_" + nowStr + ".docx"
+            new_doc_path = DOC_DIR + "/" + row[2] + "_" + nowStr + ".docx"
             shutil.copyfile(TEMPLATE_DOC, new_doc_path)
 
             doc = Document(new_doc_path)
@@ -55,10 +66,10 @@ def create_document():
             for paragraph in doc.paragraphs:
                 if paragraph.text == "${date}":
                     paragraph.text = row[0]
-                if paragraph.text == "${reauesterName}":
-                    paragraph.text = row[1]
-                if paragraph.text == "${merchantName}":
-                    paragraph.text = row[2]
+                if paragraph.text == "依頼者債務者　${requesterName}":
+                    paragraph.text = "依頼者債務者　" + row[1]
+                if paragraph.text == "　　　　${merchantName}　　御　中":
+                    paragraph.text = "　　　　" + row[2] + "　　御　中"
 
             paragraphs = (paragraph
                           for table in doc.tables
@@ -70,10 +81,10 @@ def create_document():
             for paragraph in paragraphs:
                 if paragraph.text == "${date}":
                     paragraph.text = row[0]
-                if paragraph.text == "${reauesterName}":
-                    paragraph.text = row[1]
-                if paragraph.text == "${merchantName}":
-                    paragraph.text = row[2]
+                if paragraph.text == "依頼者債務者　${requesterName}":
+                    paragraph.text = "依頼者債務者　" + row[1]
+                if paragraph.text == "　　　　${merchantName}　　御　中":
+                    paragraph.text = "　　　　" + row[2] + "　　御　中"
 
             doc.save(new_doc_path)
 
@@ -83,14 +94,14 @@ def create_pdf():
     wordファイルをpdfファイルに変換
     """
 
-    docFilePathList = glob.glob(DOC_DIR + "*.docx")
+    docFilePathList = glob.glob(DOC_DIR + "/*.docx")
 
     for docFilePath in docFilePathList:
 
         fileNameSplit = docFilePath.split("\\")
         fileName = fileNameSplit[len(fileNameSplit) - 1].split(".")[0]
 
-        outputFile = PDF_DIR + fileName + ".pdf"
+        outputFile = PDF_DIR + "/" + fileName + ".pdf"
         file = open(outputFile, "w")
         file.close()
 
@@ -101,7 +112,7 @@ def create_image():
     """
     pdfファイルをjpegファイルに変換
     """
-    pdfFilePathList = glob.glob(PDF_DIR + "*.pdf")
+    pdfFilePathList = glob.glob(PDF_DIR + "/*.pdf")
 
     for pdfFilePath in pdfFilePathList:
         fileNameSplit = pdfFilePath.split("\\")
@@ -109,7 +120,7 @@ def create_image():
 
         pages = convert_from_path(pdfFilePath)
         for page in pages:
-            page.save(IMAGES_DIR + fileName + '.jpg', 'JPEG')
+            page.save(IMAGES_DIR + "/" + fileName + '.jpg', 'JPEG')
 
 
 shutil.rmtree(DOC_DIR)
