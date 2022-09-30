@@ -31,6 +31,7 @@ TEMPLATE_DOC = get_dir_path() + "/document/template.docx"
 DOC_DIR = get_dir_path() + "/document/temp"
 PDF_DIR = get_dir_path() + "/pdf"
 IMAGES_DIR = get_dir_path() + "/images"
+POPPLER_DIR = get_dir_path() + "/poppler-0.67.0/bin"
 
 
 def get_csv_data_list():
@@ -79,8 +80,8 @@ def create_document():
                 for paragraph in doc.paragraphs:
                     if paragraph.text == "${date}":
                         paragraph.text = row[0]
-                    if paragraph.text == "依頼者債務者　${requesterName}":
-                        paragraph.text = "依頼者債務者　" + row[1]
+                    if paragraph.text == "依頼債務者　${requesterName}":
+                        paragraph.text = "依頼債務者　" + row[1]
                     if paragraph.text == "　　　　${merchantName}　　御　中":
                         paragraph.text = "　　　　" + row[2] + "　　御　中"
 
@@ -94,8 +95,8 @@ def create_document():
                 for paragraph in paragraphs:
                     if paragraph.text == "${date}":
                         paragraph.text = row[0]
-                    if paragraph.text == "依頼者債務者　${requesterName}":
-                        paragraph.text = "依頼者債務者　" + row[1]
+                    if paragraph.text == "依頼債務者　${requesterName}":
+                        paragraph.text = "依頼債務者　" + row[1]
                     if paragraph.text == "　　　　${merchantName}　　御　中":
                         paragraph.text = "　　　　" + row[2] + "　　御　中"
 
@@ -140,7 +141,7 @@ def create_image():
             fileNameSplit = pdfFilePath.split("\\")
             fileName = fileNameSplit[len(fileNameSplit) - 1].split(".")[0]
 
-            pages = convert_from_path(pdfFilePath)
+            pages = convert_from_path(pdfFilePath, poppler_path=POPPLER_DIR)
             for page in pages:
                 page.save(IMAGES_DIR + "/" + fileName + '.jpg', 'JPEG')
     except Exception as e:
